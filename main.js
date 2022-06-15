@@ -7,14 +7,20 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 
+app.use(express.static("public"))
 app.get('/', (req, res) => {
     // path to html
   res.sendFile(__dirname + '/public/index.html');
 });
+
 // socket.io start
+let onlineList = []
 io.on('connection', (socket) => {
   console.log('a user connected');
   const {nickname} = socket.handshake.query
+  // onlinelist
+  onlineList.push(nickname)
+  io.emit('online-list', onlineList)
   io.emit('user-enter', nickname)
 //   msg
 socket.on('msg', (objeto) => {
@@ -30,8 +36,12 @@ socket.on('typing', () => {
 
 //   disconnect
 socket.on('disconnect', (a) => {
-    console.log(`${nickname} disconnect`)
-    io.emit("user-left", nickname)
+    console.log(`${nickname} disconnect`);
+    
+    onlineList.splice(onlineList.indexOf(nickname), 1);
+    console.log(`${onlineList} lista de pessoas online`);
+    io.emit('online-list', onlineList);
+    io.emit("user-left", nickname);
 })
 });
 // socket.io finish

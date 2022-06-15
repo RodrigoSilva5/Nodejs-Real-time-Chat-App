@@ -5,21 +5,58 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Merriweather&family=Oxygen&display=swap" rel="stylesheet"> 
     <style>
+        body{
+            background-image: url("/background.jpg");
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size: cover; 
+        }
+        .row{
+            /* From https://css.glass */
+            background: rgba(255, 255, 255, 0.36);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(19.4px);
+            -webkit-backdrop-filter: blur(19.4px);
+            border: 1px solid rgba(255, 255, 255, 0.54);
+        }
+        ul{
+            list-style-type: none;
+        }
+
+        h1,#online-list{
+            font-family: 'Merriweather', serif;
+        }
+        .aviso{
+            font-family: 'Kanit', sans-serif;
+        }
+        .txt{
+            font-family: 'Oxygen', sans-serif;
+        } 
 
     </style>
-    <title>Chat</title>
+    <title>Chat</title> 
 </head>
 <body>
-<div class="container-md ">
-    <div class="row align-items-center justify-content-center my-5" style="height: 80vh;">
-        <div class="col-md-8 border" style="height: 80%;">
+<div id="container" class="container-md ">
+    <div class="row align-items-center justify-content-center my-5 mx-0" style="height: 80vh;">
+        <div class="col-md-2 " style="height: 100%;">
+            <h1>ONLINE</h1>
+            <ul id="online-list">
+
+            </ul>
+        </div>
+        <div class="col-md-10 " style="height: 80%;">
             <ul id="chat">
 
             </ul>
         </div>
-        <div class="col-md-8 border" style="height: 20%;">
-            <div class="form-floating">
+        <div class="col-md-10 " style="height: 20%;">
+            <div class="form-floating my-2">
                 <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
                 <label for="floatingTextarea">Digite sua mensagem:
                     
@@ -38,13 +75,20 @@
     
     let meunome =  window.prompt("Bem vindo ao chat, por favor digite seu nome")
     var socket = io({query: {nickname: meunome}})
+    // online-list
+    socket.on('online-list', (array) => {
+        document.querySelector("#online-list").innerHTML = ''
 
+        for (let i = 0; i < array.length; i++) {
+            document.querySelector("#online-list").insertAdjacentHTML("beforeend", `<li id='${array[i]}'><span style="color: green;">${array[i]}</span> </li>`)
+        }
+    })
 
     // user enter 
     socket.on('user-enter',(nickname) => {
         const html = ` 
-                    <li>
-                        <span> <strong> ${nickname} ENTROU NO CHAT</strong> </span>
+                    <li class='aviso'>
+                        <span style='color:#4EF500;'> <strong> ${nickname} ENTROU NO CHAT</strong> </span>
                     </li>`
 
         document.querySelector("#chat").insertAdjacentHTML("beforeend", html)
@@ -53,13 +97,14 @@
     // user left 
     socket.on('user-left', (nickname) => {
         const html = ` 
-                    <li>
-                        <span> <strong> ${nickname} SAIU DO CHAT</strong> </span>
+                    <li class='aviso'>
+                        <span style='color:red;'> <strong> ${nickname} SAIU DO CHAT</strong> </span>
                     </li>`
 
         document.querySelector("#chat").insertAdjacentHTML("beforeend", html)
 
     })
+
     //  SEND message
     const btn = document.querySelector('#btn')
     btn.addEventListener('click', () => {
@@ -94,7 +139,7 @@
     socket.on('chat-msg', (objeto) => {
         const {autor, msg} = objeto
             const html = ` 
-                    <li>
+                    <li class='txt'>
                         <span> <strong> ${autor}</strong> </span>
                         <p>${msg}</p>
                     </li>`
