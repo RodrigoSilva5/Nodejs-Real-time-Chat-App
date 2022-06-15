@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "real time chat app made with, express and socket.io.",
   "main": "main.js",
+  "start": "main.js",
   "scripts": {
     "test": "nodemon"
   },
